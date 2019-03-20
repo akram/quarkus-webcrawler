@@ -5,5 +5,5 @@ import io.quarkus.test.junit.SubstrateTest;
 @SubstrateTest
 public class NativeCrawlIT extends CrawlTest {
 
-	// Execute the same tests but in native mode.
+    // Execute the same tests but in native mode.
 }
