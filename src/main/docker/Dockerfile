@@ -12,9 +12,10 @@
 # docker run -i --rm -p 8080:8080 quarkus/quarkus-webcrawler
 #
 ###
-FROM registry.fedoraproject.org/fedora-minimal
+FROM cescoffier/native-base:latest
+#FROM registry.fedoraproject.org/fedora-minimal
 WORKDIR /work/
 COPY target/*-runner /work/application
-RUN chmod 775 /work
+#RUN chmod 775 /work
 EXPOSE 8080
 CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
