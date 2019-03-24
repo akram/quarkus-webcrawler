@@ -20,6 +20,7 @@ public class SimpleCrawler implements Crawler {
 	private static java.util.logging.Logger LOGGER = Logger.getLogger(SimpleCrawler.class.getName());
 	private Set<String> vistedUrls = new HashSet<String>();
 	private Set<String> links = new HashSet<String>();
+	private TreeNode<String> tree = new TreeNode<String>("/");
 	String baseUri = null;
 	private Map<String, String> cookies;
 	private int maxDepth;
@@ -31,11 +32,11 @@ public class SimpleCrawler implements Crawler {
 	}
 
 	@Override
-	public Set<String> crawl(String url) {
+	public TreeNode<String> crawl(String url) {
 		return this.crawl(url, 0);
 	}
 
-	private Set<String> crawl(String url, int currentDepth) {
+	private TreeNode<String> crawl(String url, int currentDepth) {
 		LOGGER.info("Crawling went to depth: " + currentDepth + " [" + url + "]");
 		if ((!vistedUrls.contains(url) && (currentDepth < this.maxDepth) && (currentDepth < MAX_DEPTH))) {
 			try {
@@ -50,10 +51,14 @@ public class SimpleCrawler implements Crawler {
 				Document document = connection.get();
 				Elements linksOnPage = document.select("a[href]");
 				for (Element page : linksOnPage) {
-					String link = page.attr("abs:href");
-					if (extractBaseUri(this.baseUri).equals(extractBaseUri(link))) {
-						links.add(page.attr("href"));
-						crawl(link, currentDepth + 1);
+					String absoluteLink = page.attr("abs:href");
+					String rootBaseUri = extractBaseUri(this.baseUri);
+					String linkBaseUri = extractBaseUri(absoluteLink);
+					if (rootBaseUri.equals(linkBaseUri)) { // if on the same domain
+						String link = page.attr("href");
+						links.add(link);
+						tree.addChild(link);
+						crawl(absoluteLink, currentDepth + 1);
 					}
 				}
 				currentDepth++;
@@ -64,7 +69,11 @@ public class SimpleCrawler implements Crawler {
 			LOGGER.info("URL [" + url + "] already visited ");
 		}
 
-		return links;
+		return tree;
+	}
+
+	public TreeNode<String> getTree() {
+		return tree;
 	}
 
 	private String extractBaseUri(String url) throws MalformedURLException {

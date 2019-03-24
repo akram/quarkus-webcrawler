@@ -1,7 +1,6 @@
 package com.akrambenaissi.webcrawler;
 
 import java.net.MalformedURLException;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.DefaultValue;
@@ -29,10 +28,11 @@ public class Sitemap {
 			return Response.serverError().status(Status.NOT_ACCEPTABLE).build();
 		}
 
-		Crawler crawler = new SimpleCrawler(url, maxDepth);
-//		Crawler crawler = new MultiThreadedCrawler();
-		Set<String> result = crawler.crawl(url);
-		return Response.ok(result).build();
+//		Crawler crawler = new SimpleCrawler(url, maxDepth);
+		Crawler crawler = new MultiThreadedCrawler();
+		TreeNode<String> result = crawler.crawl(url);
+		System.out.println("RESULT AS TREE: \n " + crawler.getTree() + "\n/ END OF RESULT AS TREE");
+		return Response.ok(crawler.getTree()).build();
 
 	}
 

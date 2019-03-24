@@ -12,9 +12,12 @@ import net.codestory.http.WebServer;
 public class CrawlTest {
 
 	private static final Object HTML_ONE_LINK = "<html><head></head><body><a href=\"/link1\">first link</a></body></html>";
-	private static final Object HTML_TWO_LINKS = "<html><head></head><body><a href=\"/link1\">link 1</a></body><a href=\"/link2\">link 2</a></body></html>";
-	private static final Object HTML_NESTED_LINKS = "<html><head></head><body><a href=\"/link1\">link 1</a></body><a href=\"/link2\">link 2</a></body></html>";
+	private static final Object HTML_TWO_LINKS = "<html><head></head><body><a href=\"/link1\">link 1</a><a href=\"/link2\">link 2</a></body></html>";
+	private static final Object HTML_NESTED_LINKS = "<html><head></head><body><a href=\"/link1\">link 1</a><a href=\"/link2\">link 2</a></body></html>";
 	private static final Object HTML_NESTED_LINKS_SUB = "<html><head></head><body><a href=\"link1/link1.1\">link 1</a></body><a href=\"/link2\">link 2</a></body></html>";
+
+	private static final Object HTML_A_TO_B_AND_C = "<html><head></head><body><a href=\"/B\">B</a><a href=\"/C\">C</a></body></html>";
+	private static final Object HTML_B_TO_A_AND_C = "<html><head></head><body><a href=\"/A\">A</a><a href=\"/C\">C</a></body></html>";
 
 	@Test
 	public void testDefaultEndpointWithNullUrl() {
@@ -69,6 +72,17 @@ public class CrawlTest {
 		String url = "/?url=http://localhost:" + port + "&depth=2";
 		given().when().get(url).then().statusCode(200).and().body(containsString("/link1")).and()
 				.body(containsString("/link2")).and().body(containsString("link1/link1.1"));
+		// ws.stop();
+	}
+
+	@Test
+	public void testDefaultEndpointWithLoop() {
+		WebServer ws = new WebServer(routes -> routes.get("/", HTML_A_TO_B_AND_C).get("/B", HTML_B_TO_A_AND_C));
+		int port = ws.startOnRandomPort().port();
+		String url = "/?url=http://localhost:" + port + "&depth=2";
+		given().when().get(url).then().statusCode(200).and().body(containsString("/A")).and()
+				.body(containsString("/B"));
+
 		// ws.stop();
 	}
 

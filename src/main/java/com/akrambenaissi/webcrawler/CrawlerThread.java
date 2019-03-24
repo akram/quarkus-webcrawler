@@ -17,9 +17,9 @@ public class CrawlerThread implements Runnable {
 	private static Set<String> unvisited = new ConcurrentSkipListSet<String>();
 
 	private String url;
-	private Set<String> links;
+	private TreeNode<String> links;
 
-	public CrawlerThread(String url, Set<String> links) {
+	public CrawlerThread(String url, TreeNode<String> links) {
 		this.url = url;
 		this.links = links;
 	}
@@ -44,11 +44,11 @@ public class CrawlerThread implements Runnable {
 					if (!link.contains("#") && !link.contains("javascript") && !link.equals(url)) {
 						if (link.startsWith("http") || link.startsWith("www")) {
 							if (link.contains(url)) {
-								links.add(link);
+								links.addChild(link);
 								unvisited.add(link);
 							}
 						} else if (link.startsWith("/")) {
-							links.add(link);
+							links.addChild(link);
 							unvisited.add(link);
 						}
 					}
