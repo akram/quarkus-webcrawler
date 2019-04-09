@@ -18,6 +18,7 @@ public class CrawlTest {
 
 	private static final Object HTML_A_TO_B_AND_C = "<html><head></head><body><a href=\"/B\">B</a><a href=\"/C\">C</a></body></html>";
 	private static final Object HTML_B_TO_A_AND_C = "<html><head></head><body><a href=\"/A\">A</a><a href=\"/C\">C</a></body></html>";
+	private static final Object HTML_C_TO_D = "<html><head></head><body><a href=\"D\">D</a><a href=\"/C\">C</a></body></html>";;
 
 	@Test
 	public void testDefaultEndpointWithNullUrl() {
@@ -78,6 +79,18 @@ public class CrawlTest {
 	@Test
 	public void testDefaultEndpointWithLoop() {
 		WebServer ws = new WebServer(routes -> routes.get("/", HTML_A_TO_B_AND_C).get("/B", HTML_B_TO_A_AND_C));
+		int port = ws.startOnRandomPort().port();
+		String url = "/?url=http://localhost:" + port + "&depth=2";
+		given().when().get(url).then().statusCode(200).and().body(containsString("/A")).and()
+				.body(containsString("/B"));
+
+		// ws.stop();
+	}
+
+	@Test
+	public void testThreeSubLevels() {
+		WebServer ws = new WebServer(
+				routes -> routes.get("/", HTML_A_TO_B_AND_C).get("/B", HTML_B_TO_A_AND_C).get("B/D", HTML_C_TO_D));
 		int port = ws.startOnRandomPort().port();
 		String url = "/?url=http://localhost:" + port + "&depth=2";
 		given().when().get(url).then().statusCode(200).and().body(containsString("/A")).and()

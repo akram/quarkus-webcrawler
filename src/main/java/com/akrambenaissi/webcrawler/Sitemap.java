@@ -28,10 +28,10 @@ public class Sitemap {
 			return Response.serverError().status(Status.NOT_ACCEPTABLE).build();
 		}
 
-//		Crawler crawler = new SimpleCrawler(url, maxDepth);
-		Crawler crawler = new MultiThreadedCrawler();
-		TreeNode<String> result = crawler.crawl(url);
-		System.out.println("RESULT AS TREE: \n " + crawler.getTree() + "\n/ END OF RESULT AS TREE");
+		Crawler crawler = new SimpleCrawler(url, maxDepth);
+		//Crawler crawler = new MultiThreadedCrawler();
+		crawler.crawl(url);
+		System.out.println("RESULT AS TREE: \n" + crawler.getTree() + "\n/ END OF RESULT AS TREE");
 		return Response.ok(crawler.getTree()).build();
 
 	}
